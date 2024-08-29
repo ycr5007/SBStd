@@ -46,8 +46,16 @@ gitHub Projects 생성
     1. git 명령어 수행
         git fetch origin
         git checkout [issueBranchName]
-=========================================================
 
+    2. 개인 개발 완료 후, issueBranch 에서 commit & push
+
+=========================================================
+issueBranch to develop PullRequest 생성
 ---------------------------------------------------------
+* 방향 : develop <== [issueBranch]
+* 작업내용 describe 작성 후, request 요청·생성
+
+* Project Master 는 요청 내용 확인 (소스리뷰) 후, request 승인
+* 승인되지 않은 경우, Comment 확인 후 재작업 > commit & push
 
 =========================================================
