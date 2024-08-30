@@ -1,0 +1,80 @@
+Git 작업 프로세스
+
+=========================================================
+Project 등록 및 GitHub 연결 작업
+---------------------------------------------------------
+    1. local 시스템 git 폴더 생성
+        git init
+
+    2. local git Directory - gitHub repository 연결
+        git remote add origin [git:repository Domain]
+
+    3. 계정정보 등록
+        git config --global user.name [git:userName]
+        git config --global user.email [git:eMail]
+
+    4. local git 파일 등록 및 Commit
+        git add [git/path]
+        git commit -m "[Desc Message]"
+
+    5. gitHub Push
+    	git push origin master
+
+=========================================================
+git branch 설정
+---------------------------------------------------------
+* main, master : 현행 운영 소스
+    > 가능하면 Branch 자체를 Lock 하고, Pull Request 방식으로 Merge 권장 (운영 소스 보호)
+* develop : 개발 기준 소스 (협업 소스)
+
+    1. branch 생성 및 전환
+        git checkout [branchName]
+            ※ 로컬에서 GitHub 반영 명령어 (git push --set-upstream origin [branchName])
+
+=========================================================
+gitHub Projects 생성
+---------------------------------------------------------
+* GitHub repository Projects 탭에서 프로젝트 생성
+    > 업무단위로 관리하며, 담당자에게 할당하여 업무 진행
+    > Board 템플릿 사용 좋을듯 ?
+
+* Project 생성 후, Item 추가하여 관리
+    > Item 선택 후, Convert to issue 버튼 통해 issue 생성
+    > Issue 내, 우측 메뉴 Create a branch 로 개인 개발자의 branch 를 생성
+        ※ develop : 협업, issue_branch : 개인
+
+    1. git 명령어 수행
+        git fetch origin
+        git checkout [issueBranchName]
+
+    2. 개인 개발 완료 후, issueBranch 에서 commit & push
+
+=========================================================
+issueBranch to develop PullRequest 생성
+---------------------------------------------------------
+* 방향 : develop <== [issueBranch]
+* 작업내용 describe 작성 후, request 요청·생성
+
+* Project Master 는 요청 내용 확인 (소스리뷰) 후, request 승인
+* 승인되지 않은 경우, Comment 확인 후 재작업 > commit & push
+
+* Conflict 발생 시, 수정(merge) 후 push 필요
+    1. git checkout develop
+
+    2. git pull origin develop
+
+    3. git checkout [issueBranch]
+
+    4. git merge develop
+
+    5. 충돌 부분 해결 필요 (디버깅 필요)
+
+    6. git commit & push
+=========================================================
+develop to main, master PullRequest 생성
+---------------------------------------------------------
+* 최종 운영 반영 (배포) - 일반적으로 2주 간격 배포
+
+1. Pull Request 생성 (master <== develop)
+
+2. 코드 리뷰 후, 최종 approve & merge
