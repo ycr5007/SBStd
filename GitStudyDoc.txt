@@ -58,4 +58,23 @@ issueBranch to develop PullRequest 생성
 * Project Master 는 요청 내용 확인 (소스리뷰) 후, request 승인
 * 승인되지 않은 경우, Comment 확인 후 재작업 > commit & push
 
+* Conflict 발생 시, 수정(merge) 후 push 필요
+    1. git checkout develop
+
+    2. git pull origin develop
+
+    3. git checkout [issueBranch]
+
+    4. git merge develop
+
+    5. 충돌 부분 해결 필요 (디버깅 필요)
+
+    6. git commit & push
 =========================================================
+develop to main, master PullRequest 생성
+---------------------------------------------------------
+* 최종 운영 반영 (배포) - 일반적으로 2주 간격 배포
+
+1. Pull Request 생성 (master <== develop)
+
+2. 코드 리뷰 후, 최종 approve & merge
