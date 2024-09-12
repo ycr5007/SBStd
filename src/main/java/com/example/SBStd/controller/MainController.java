@@ -1,6 +1,7 @@
 package com.example.SBStd.controller;
 
 import com.example.SBStd.domain.Article;
+import com.example.SBStd.domain.Person;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpSession;
 import org.springframework.web.bind.annotation.*;
@@ -18,6 +19,26 @@ public class MainController {
 
     // 데이터 보존을 위한 전역변수
     private int reqCnt = 0;
+
+    // DB 대용 List instance
+    private List<Article> articles = new ArrayList<>(
+            // Default DataSet
+            Arrays.asList(
+                    new Article("title1", "Hello World")
+                    , new Article("title2", "GoodBye World")
+                    , new Article("title3", "This is New World")
+            )
+    );
+
+    private List<Person> persons = new ArrayList<>(
+            // Default DataSet
+            Arrays.asList(
+                    new Person(23, "James")
+                    , new Person(29, "Robert")
+                    , new Person(21, "Ciro")
+            )
+    );
+
 
     @RequestMapping("/sbStd")
     public String index() {
@@ -154,16 +175,6 @@ public class MainController {
                 """.formatted(session.getAttribute("userID"), session.getAttribute("value"));
     }
 
-    // DB 대용 List instance
-    private List<Article> articles = new ArrayList<>(
-            // Default DataSet
-            Arrays.asList(
-                    new Article("title1", "Hello World")
-                    , new Article("title2", "GoodBye World")
-                    , new Article("title3", "This is New World")
-            )
-    );
-
     @GetMapping("/addArticle")
     @ResponseBody
     public String addArticle(String title, String body) {
@@ -202,7 +213,9 @@ public class MainController {
 
     @GetMapping("/modifyArticle/{id}")
     @ResponseBody
-    public String showOneArticle(@PathVariable int id, String title, String body) {
+    public String modifyArticle(@PathVariable int id, String title, String body) {
+
+        /* NoSUchElementException try-catch 처리
         Article article = null;
         try {
             article = articles
@@ -216,6 +229,20 @@ public class MainController {
                     <span>%d is not found Article</span>
                     """.formatted(e.toString(), id);
         }
+        */
+
+        // Optional 을 할용한 filter null 처리
+        Article article = articles
+                .stream()
+                .filter(a -> a.getId() == id)
+                .findFirst()
+                .orElse(null); // id 를 찾지 목하면 null 반환
+
+        if(article == null)
+            return """
+            <span>%d is not found Article</span>
+            """.formatted(id);
+
         article.setTitle(title);
         article.setBody(body);
 
@@ -223,5 +250,52 @@ public class MainController {
                 <span>modify Successfully %d Article</span>
                 """.formatted(id);
     }
-}
 
+    @RequestMapping("/deleteArticle/{id}")
+    @ResponseBody
+    public String deleteArticle(@PathVariable int id) {
+
+        Article article = articles
+                .stream()
+                .filter(a -> a.getId() == id)
+                .findFirst()
+                .orElse(null); // id 를 찾지 목하면 null 반환
+
+        if(article == null)
+            return """
+            <span>%d is not found Article</span>
+            """.formatted(id);
+
+        // List 데이터 삭제
+        articles.remove(article);
+
+        return """
+                <span>delete Successfully %d Article</span>
+                """.formatted(id);
+    }
+
+    // @RequestMapping("/addPerson")
+    @RequestMapping("/addPerson/{id}") // @PathVariable 또한 자동으로 Mapping 된다. (단, 이 때는 id 값을 입력 받기에 매개변수의 Id 값이 저장된다.)
+    // Spring 동작 우선순위 : QueryString > PathVariable (ex) localhost:8080/1?id=2&age=23&name=test => Result : id = 1 / age = 23 / name = test
+    @ResponseBody
+    public String addPerson(Person person) {
+        persons.add(person);
+        return """
+                <span>create Successfully %d User</span>
+                """.formatted(person.getId()); // 생성자를 거치지 않기 떄문에 Id 값은 항상 0 으로 매개변수의 값만 저장한다.
+    }
+
+    @RequestMapping("/showPersons")
+    @ResponseBody
+    public String showPersonList() {
+        StringBuilder rs = new StringBuilder();
+        persons.forEach(a -> {
+            rs.append("""
+                    <p>
+                        <a href="/???/%d">%s </a>
+                    </p>
+                    """.formatted(a.getId(), a.getName()));
+        });
+        return rs.toString();
+    }
+}
