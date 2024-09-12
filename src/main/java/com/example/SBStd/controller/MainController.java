@@ -1,10 +1,14 @@
 package com.example.SBStd.controller;
 
-import jakarta.servlet.http.HttpServlet;
+import com.example.SBStd.domain.Article;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpSession;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+import java.util.NoSuchElementException;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
@@ -71,9 +75,9 @@ public class MainController {
                 .collect(Collectors.joining("<br>"));
 
         /*
-        * Lamda : 람다 캡처링(capturing lambda)이란 간단히 말해 이처럼 파라미터로 넘겨받은 데이터가 아닌
-        *           람다식 외부에서 정의된 변수를 참조하는 변수를 람다식 내부에 저장하고 사용하는 동작을 의미
-        * */
+         * Lamda : 람다 캡처링(capturing lambda)이란 간단히 말해 이처럼 파라미터로 넘겨받은 데이터가 아닌
+         *           람다식 외부에서 정의된 변수를 참조하는 변수를 람다식 내부에 저장하고 사용하는 동작을 의미
+         * */
     }
 
     // PathVariable 의 경우, 값이 없을 경우 404 Error 발생
@@ -98,7 +102,7 @@ public class MainController {
     @GetMapping("/inputSessionID")
     @ResponseBody
     public String inputSession() {
-        int rand = (int)(Math.random() * 100) + 1;
+        int rand = (int) (Math.random() * 100) + 1;
         return """
                 <h1>Input Session Data</h1>
                 <form method="POST" action="/saveSessionID/%d">
@@ -117,7 +121,7 @@ public class MainController {
         session.setAttribute("userID", id);
         session.setAttribute("value", value);
 
-        if(id == null || id.isEmpty()) {
+        if (id == null || id.isEmpty()) {
             id = "Who Are You?";
             session.invalidate();
         }
@@ -149,4 +153,75 @@ public class MainController {
                     <span>value : %s</span>
                 """.formatted(session.getAttribute("userID"), session.getAttribute("value"));
     }
+
+    // DB 대용 List instance
+    private List<Article> articles = new ArrayList<>(
+            // Default DataSet
+            Arrays.asList(
+                    new Article("title1", "Hello World")
+                    , new Article("title2", "GoodBye World")
+                    , new Article("title3", "This is New World")
+            )
+    );
+
+    @GetMapping("/addArticle")
+    @ResponseBody
+    public String addArticle(String title, String body) {
+        Article article = new Article(title, body);
+        articles.add(article);
+
+        return """
+                <span>create Successfully %d Article</span>
+                """.formatted(article.getId());
+    }
+
+    @GetMapping("/showArticles")
+    @ResponseBody
+    public String showArticles() {
+        StringBuilder rs = new StringBuilder();
+        articles.forEach(a -> {
+            rs.append("""
+                    <p>
+                        <a href="/showArticle/%d">%s </a>
+                    </p>
+                    """.formatted(a.getId(), a.getTitle()));
+        });
+        return rs.toString();
+    }
+
+    @GetMapping("/showArticle/{id}")
+    @ResponseBody
+    public Article showOneArticle(@PathVariable int id) {
+        Article article = articles
+                .stream()
+                .filter(a -> a.getId() == id)
+                .findFirst()// 특정 id 값을 기준으로 지정된 loop 까지 반복 수행 (for 문에서 if - return 방식)
+                .get();
+        return article;
+    }
+
+    @GetMapping("/modifyArticle/{id}")
+    @ResponseBody
+    public String showOneArticle(@PathVariable int id, String title, String body) {
+        Article article = null;
+        try {
+            article = articles
+                    .stream()
+                    .filter(a -> a.getId() == id)
+                    .findFirst()// 특정 id 값을 기준으로 지정된 loop 까지 반복 수행 (for 문에서 if - return 방식)
+                    .get();
+        } catch(NoSuchElementException e) {
+            return """
+                    <p>%s</p>
+                    <span>%d is not found Article</span>
+                    """.formatted(e.toString(), id);
+        }
+        article.setTitle(title);
+        article.setBody(body);
+
+        return """
+                <span>modify Successfully %d Article</span>
+                """.formatted(id);
+    }
 }
+
