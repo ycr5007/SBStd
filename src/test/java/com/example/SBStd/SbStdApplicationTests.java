@@ -8,10 +8,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 
 import java.time.LocalDateTime;
-import java.util.Date;
 import java.util.List;
+import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 @SpringBootTest
 class SbStdApplicationTests {
@@ -30,6 +31,13 @@ class SbStdApplicationTests {
 
 		Question q1 = dto.toEntity();
 		this.questionRepository.save(q1); // Id (Auto Increment) 생성 시점
+
+		dto = new QuestionDto.Request();
+		dto.setSubject("Question 2");
+		dto.setContent("This Is Test Data");
+		dto.setCreateDate(LocalDateTime.now());
+
+		this.questionRepository.save(dto.toEntity());
 	}
 
 	@Test
@@ -38,23 +46,34 @@ class SbStdApplicationTests {
 		assertEquals(2, all.size()); // 예상값과 실제 값이 같은지 확인
 
 		Question q = all.get(0);
-		assertEquals("Quetion 1", q.getSubject());
+		assertEquals("Question 1", q.getSubject());
 
 		System.out.println(q.getContent());
 	}
 
 	@Test
 	void testFindBySubject() {
-		String findStr = "Quetion 1";
+		String findStr = "Question 1";
 
 		Question q = questionRepository.findBySubject(findStr); // 일치하는 데이터가 없을 떄 null 반환
-		assertEquals("Quetion 1", q.getSubject());
+		assertEquals("Question 1", q.getSubject());
 
 		System.out.println(q.getContent());
 	}
 
 	@Test
-	void contextLoads() {
+	void testFindById() {
+		Optional<Question> oq = questionRepository.findById(5);
+		Question q = oq.orElseGet(() -> {
+			QuestionDto.Request reqDto = new QuestionDto.Request();
+			reqDto.setSubject("Optional orElseGet");
+			reqDto.setContent("orElseGet()");
+			reqDto.setCreateDate(LocalDateTime.now());
+			return questionRepository.save(reqDto.toEntity());
+		});
+
+		QuestionDto.Response resDto = new QuestionDto.Response(q);
+		System.out.println("%d / %s , %s , (%s)".formatted(resDto.getId(), resDto.getSubject(), resDto.getContent(), resDto.getCreateDate()));
 	}
 
 }
