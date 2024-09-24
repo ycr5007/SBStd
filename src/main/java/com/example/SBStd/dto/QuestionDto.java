@@ -26,21 +26,21 @@ public class QuestionDto {
                     .build();
             return questions;
         }
+    }
 
-        @RequiredArgsConstructor
-        @Getter
-        public static class Response {
-            private Integer id;
-            private String subject;
-            private String content;
-            private LocalDateTime createDate;
+    @RequiredArgsConstructor
+    @Getter
+    public static class Response {
+        private Integer id;
+        private String subject;
+        private String content;
+        private LocalDateTime createDate;
 
-            public Response (Question question) {
-                this.id = question.getId();
-                this.subject = question.getSubject();
-                this.content = question.getContent();
-                this.createDate = question.getCreateDate();
-            }
+        public Response (Question question) {
+            this.id = question.getId();
+            this.subject = question.getSubject();
+            this.content = question.getContent();
+            this.createDate = question.getCreateDate();
         }
     }
 }

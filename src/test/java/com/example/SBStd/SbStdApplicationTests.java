@@ -10,6 +10,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import java.time.LocalDateTime;
 import java.util.Date;
 import java.util.List;
+import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
@@ -72,6 +73,21 @@ class SbStdApplicationTests {
 		assertEquals(1, q.getId());
 
 		System.out.println("Question Id : %d".formatted(q.getId()));
+	}
+
+	@Test
+	void testFindById() {
+		Optional<Question> oq = questionRepository.findById(5);
+		Question q = oq.orElseGet(() -> {
+			QuestionDto.Request reqDto = new QuestionDto.Request();
+			reqDto.setSubject("Optional orElseGet");
+			reqDto.setContent("orElseGet()");
+			reqDto.setCreateDate(LocalDateTime.now());
+			return questionRepository.save(reqDto.toEntity());
+		});
+
+		QuestionDto.Response resDto = new QuestionDto.Response(q);
+		System.out.println("%d / %s , %s , (%s)".formatted(resDto.getId(), resDto.getSubject(), resDto.getContent(), resDto.getCreateDate()));
 	}
 
 	@Test
