@@ -28,10 +28,3 @@
     <li>1 : N 관계 : </li>
     <li>N : M 관계 : </li>
 </ul>
-
-<h3>JPA Repository 기본 Method</h3>
-<ul>
-    <li>save(Entity) : (Entity)Data Insert</li>
-    <li>findAll() : SELECT * FROM TBL</li>
-    <li>findById(ID) SELECT * FROM TBL WHERE ID = ID</li>
-</ul>
