@@ -54,6 +54,27 @@ class SbStdApplicationTests {
 	}
 
 	@Test
+	void testFindByContent() {
+		String findStr = "Test JPA INSERT TEST";
+
+		Question q = questionRepository.findByContent(findStr); // 일치하는 데이터가 없을 떄 null 반환
+		assertEquals("Test JPA INSERT TEST", q.getContent());
+
+		System.out.println(q.getSubject());
+	}
+
+	@Test
+	void testFindBySubjectAndContent() {
+		String findStr1 = "Quetion 1";
+		String findStr2 = "Please Answer to me";
+
+		Question q = questionRepository.findBySubjectAndContent(findStr1, findStr2);
+		assertEquals(1, q.getId());
+
+		System.out.println("Question Id : %d".formatted(q.getId()));
+	}
+
+	@Test
 	void contextLoads() {
 	}
 
